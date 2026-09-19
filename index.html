@@ -996,21 +996,20 @@
         /* BOTONES DE PREGUNTAS                               */
         /* ================================================= */
 
-        .contenedor-preguntas {
+      .contenedor-preguntas {
 
-            width: 40%;
-
+            /* MISMO ANCHO MÁXIMO QUE LA PORTADA */
+            width: calc(70% - 32px);
             max-width: 420px;
 
-            margin: 25px auto 0 auto;
+            margin: 50px auto 0 auto;
 
             display: grid;
 
-            grid-template-columns: 1fr 1fr;
+            /* 4 BOTONES POR FILA */
+            grid-template-columns: repeat(5, 1fr);
 
             gap: 10px;
-
-            margin-top: 50px;
         }
 
         .boton-pregunta {
@@ -1039,23 +1038,27 @@
 
         }
 
+        .boton-pregunta.activo {
+
+            background: #ff8c1a !important;
+
+            color: white;
+
+            transform: scale(1.03);
+
+        }
+
+
         .boton-pregunta:hover {
 
-            transform: scale(1.02);
+            transform: scale(1.04);
 
         }
 
         .boton-pregunta:active {
 
             transform: scale(0.97);
-
-        }
-
-        .boton-pregunta.activo {
-
-            background: #ff8c1a;
-
-            box-shadow: 0 0 12px rgba(255, 140, 26, 0.8);
+            background: #ff8c1a
 
         }
 
@@ -1476,9 +1479,6 @@ function descargarPDF() {
             const pregunta =
                 preguntas[indice];
 
-            const siguiente =
-                preguntas[indice + 1];
-
 
             /* Si el tutorial está sonando, se pausa. */
 
@@ -1499,12 +1499,24 @@ function descargarPDF() {
 
             audioPreguntas.pause();
 
-            audioPreguntas.currentTime =
-                pregunta.t;
+
+            /*
+               Primero guardamos la nueva pregunta como activa.
+               Esto hace que el botón quede naranja inmediatamente.
+            */
 
             preguntaActiva = indice;
 
             actualizarBotonesPreguntas();
+
+
+            /*
+               Ahora posicionamos el audio en el inicio
+               exacto de esta pregunta.
+            */
+
+            audioPreguntas.currentTime =
+                pregunta.t;
 
 
             audioPreguntas.play().catch(function(error) {
@@ -1527,20 +1539,19 @@ function descargarPDF() {
         function actualizarBotonesPreguntas() {
 
             const botones =
-                botonesPreguntas.querySelectorAll(
-                    ".boton-pregunta"
-                );
+                botonesPreguntas.querySelectorAll(".boton-pregunta");
 
-            botones.forEach(function(boton, indice) {
+            botones.forEach(function(boton) {
 
-                boton.classList.toggle(
-                    "activo",
-                    indice === preguntaActiva &&
-                    !audioPreguntas.paused &&
-                    !audioPreguntas.ended
-                );
+                boton.classList.remove("activo");
 
             });
+
+            if (preguntaActiva >= 0) {
+
+                botones[preguntaActiva].classList.add("activo");
+
+            }
 
         }
 
@@ -1558,12 +1569,14 @@ function descargarPDF() {
                     return;
                 }
 
+
                 const siguiente =
                     preguntas[preguntaActiva + 1];
 
+
                 /*
-                   Todas las preguntas, excepto la 30, terminan
-                   exactamente cuando comienza la siguiente.
+                   La pregunta termina exactamente cuando
+                   comienza la siguiente.
                 */
 
                 if (
@@ -1573,8 +1586,10 @@ function descargarPDF() {
 
                     audioPreguntas.pause();
 
-                    audioPreguntas.currentTime =
-                        siguiente.t;
+
+                    /*
+                       Recién ahora quitamos el estado naranja.
+                    */
 
                     preguntaActiva = -1;
 
@@ -1584,7 +1599,6 @@ function descargarPDF() {
 
             }
         );
-
 
 
         /* ================================================= */
@@ -1601,8 +1615,6 @@ function descargarPDF() {
 
             }
         );
-
-
 
 
         /* ================================================= */
